@@ -9,6 +9,7 @@ Added
 ~~~~~
 
 * Goodbooks dataset.
+* Mixture-of-tastes representations.
 
 Changed
 ~~~~~~~
