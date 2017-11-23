@@ -101,7 +101,7 @@ class MixtureNet(nn.Module):
     embeddings for each user as well as attention vectors
     that match each taste to the items it describes.
 
-    For a full description of the model, see [5]_.
+    For a full description of the model, see [1]_.
 
     Parameters
     ----------
@@ -120,7 +120,7 @@ class MixtureNet(nn.Module):
     References
     ----------
 
-    .. [5] Kula, Maciej. "Mixture-of-tastes Models for Representing
+    .. [1] Kula, Maciej. "Mixture-of-tastes Models for Representing
        Users with Diverse Interests" https://arxiv.org/abs/1711.08379 (2017)
     """
 
