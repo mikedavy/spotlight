@@ -491,7 +491,7 @@ class MixtureLSTMNet(nn.Module):
     ----------
 
     .. [5] Kula, Maciej. "Mixture-of-tastes Models for Representing
-       Users with Diverse Interests" https://github.com/maciejkula/mixture (2017)
+       Users with Diverse Interests" https://arxiv.org/abs/1711.08379 (2017)
     """
 
     def __init__(self, num_items,

@@ -16,7 +16,8 @@ from spotlight.losses import (adaptive_hinge_loss,
                               bpr_loss,
                               hinge_loss,
                               pointwise_loss)
-from spotlight.factorization.representations import BilinearNet
+from spotlight.factorization.representations import (BilinearNet,
+                                                     MixtureNet)
 from spotlight.sampling import sample_items
 from spotlight.torch_utils import cpu, gpu, minibatch, set_seed, shuffle
 
@@ -63,10 +64,10 @@ class ImplicitFactorizationModel(object):
     use_cuda: boolean, optional
         Run the model on a GPU.
     representation: a representation module, optional
-        If supplied, will override default settings and be used as the
-        main network module in the model. Intended to be used as an escape
-        hatch when you want to reuse the model's training functions but
-        want full freedom to specify your network topology.
+        User and item representation to use. If string, must be one of
+        'bilinear', 'mixture'; otherwise, must be one of representations
+        from :class:`spotlight.factorization.representations` or something
+        with a compatible interface.
     sparse: boolean, optional
         Use sparse gradients for embedding layers.
     random_state: instance of numpy.random.RandomState, optional
@@ -84,7 +85,7 @@ class ImplicitFactorizationModel(object):
                  learning_rate=1e-2,
                  optimizer_func=None,
                  use_cuda=False,
-                 representation=None,
+                 representation='bilinear',
                  sparse=False,
                  random_state=None,
                  num_negative_samples=5):
@@ -130,10 +131,7 @@ class ImplicitFactorizationModel(object):
          self._num_items) = (interactions.num_users,
                              interactions.num_items)
 
-        if self._representation is not None:
-            self._net = gpu(self._representation,
-                            self._use_cuda)
-        else:
+        if self._representation == 'bilinear':
             self._net = gpu(
                 BilinearNet(self._num_users,
                             self._num_items,
@@ -141,6 +139,17 @@ class ImplicitFactorizationModel(object):
                             sparse=self._sparse),
                 self._use_cuda
             )
+        elif self._representation == 'mixture':
+            self._net = gpu(
+                MixtureNet(self._num_users,
+                           self._num_items,
+                           self._embedding_dim,
+                           sparse=self._sparse),
+                self._use_cuda
+            )
+        else:
+            self._net = gpu(self._representation,
+                            self._use_cuda)
 
         if self._optimizer_func is None:
             self._optimizer = optim.Adam(
