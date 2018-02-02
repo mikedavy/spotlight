@@ -16,7 +16,6 @@ from spotlight.losses import (adaptive_hinge_loss,
                               bpr_loss,
                               hinge_loss,
                               pointwise_loss,
-                              cross_entropy_loss,
                               cross_entropy_loss_with_logits)
 from spotlight.factorization.representations import BilinearNet
 from spotlight.sampling import sample_items

@@ -16,23 +16,6 @@ from torch.autograd import Variable
 from spotlight.torch_utils import assert_no_grad
 
 
-def cross_entropy_loss(positive_prediction, negative_prediction=None):
-    criterion = torch.nn.BCELoss()
-
-    if negative_prediction is None:
-        targets = Variable(torch.ones(len(positive_prediction))).float()
-        pred = F.sigmoid(positive_prediction)
-
-    else:
-        targets = Variable(torch.cat([torch.ones(len(positive_prediction)),
-                                      torch.zeros(len(negative_prediction))], dim=0)).float()
-
-        pred = torch.cat([F.sigmoid(positive_prediction),
-                          F.sigmoid(negative_prediction)], dim=0)
-
-    return criterion(pred, targets)
-
-
 def cross_entropy_loss_with_logits(positive_prediction, negative_prediction=None, mask=None):
     """
     Cross entropy
@@ -52,13 +35,12 @@ def cross_entropy_loss_with_logits(positive_prediction, negative_prediction=None
     criterion = torch.nn.BCEWithLogitsLoss()
 
     if negative_prediction is None:
-        targets = Variable(torch.ones(len(positive_prediction))).float()
+        targets = Variable(torch.ones(len(positive_prediction)), requires_grad=False).float()
         pred = positive_prediction
 
     else:
         targets = Variable(torch.cat([torch.ones(len(positive_prediction)),
-                                      torch.zeros(len(negative_prediction))], dim=0)).float()
-
+                                      torch.zeros(len(negative_prediction))], dim=0), requires_grad=False).float()
         pred = torch.cat([positive_prediction,
                           negative_prediction], dim=0)
 
