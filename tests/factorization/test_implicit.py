@@ -35,6 +35,26 @@ def test_pointwise():
     assert mrr > 0.05
 
 
+def test_xe():
+
+    interactions = movielens.get_movielens_dataset('100K')
+
+    train, test = random_train_test_split(interactions,
+                                          random_state=RANDOM_STATE)
+
+    model = ImplicitFactorizationModel(loss='xe',
+                                       n_iter=10,
+                                       batch_size=1024,
+                                       learning_rate=1e-2,
+                                       l2=1e-6,
+                                       use_cuda=CUDA)
+    model.fit(train)
+
+    mrr = mrr_score(model, test, train=train).mean()
+
+    assert mrr > 0.07
+
+
 def test_bpr():
 
     interactions = movielens.get_movielens_dataset('100K')

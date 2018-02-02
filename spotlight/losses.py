@@ -12,7 +12,61 @@ import torch
 
 import torch.nn.functional as F
 
+from torch.autograd import Variable
 from spotlight.torch_utils import assert_no_grad
+
+
+def cross_entropy_loss(positive_prediction, negative_prediction=None):
+    criterion = torch.nn.BCELoss()
+
+    if negative_prediction is None:
+        targets = Variable(torch.ones(len(positive_prediction))).float()
+        pred = F.sigmoid(positive_prediction)
+
+    else:
+        targets = Variable(torch.cat([torch.ones(len(positive_prediction)),
+                                      torch.zeros(len(negative_prediction))], dim=0)).float()
+
+        pred = torch.cat([F.sigmoid(positive_prediction),
+                          F.sigmoid(negative_prediction)], dim=0)
+
+    return criterion(pred, targets)
+
+
+def cross_entropy_loss_with_logits(positive_prediction, negative_prediction=None, mask=None):
+    """
+    Cross entropy
+
+    Parameters
+    ----------
+    positive_predictions: tensor
+        Tensor containing predictions for known positive items.
+    negative_predictions: tensor
+        Tensor containing predictions for sampled negative items.
+    mask: tensor, optional
+        A binary tensor used to zero the loss from some entries
+        of the loss tensor.
+
+    :return:
+    """
+    criterion = torch.nn.BCEWithLogitsLoss()
+
+    if negative_prediction is None:
+        targets = Variable(torch.ones(len(positive_prediction))).float()
+        pred = positive_prediction
+
+    else:
+        targets = Variable(torch.cat([torch.ones(len(positive_prediction)),
+                                      torch.zeros(len(negative_prediction))], dim=0)).float()
+
+        pred = torch.cat([positive_prediction,
+                          negative_prediction], dim=0)
+
+    if mask is not None:
+        mask = mask.float()
+        pred = pred * mask
+
+    return criterion(pred, targets)
 
 
 def pointwise_loss(positive_predictions, negative_predictions, mask=None):
